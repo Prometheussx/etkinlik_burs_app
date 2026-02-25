@@ -149,6 +149,19 @@ def parse_event_card(card, base_url, city, category):
     except Exception as e:
         return None
 
+def popup_kapat(driver, timeout=5):
+    """Sayfa açılırken çıkan pop-up'ı kapatır. Çıkmazsa görmezden gelir."""
+    try:
+        print("🔍 Pop-up kontrol ediliyor...")
+        close_btn = WebDriverWait(driver, timeout).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.absolute.top-4.right-4.z-50"))
+        )
+        close_btn.click()
+        print("✅ Pop-up kapatıldı!")
+        time.sleep(1)
+    except Exception:
+        print("ℹ️ Pop-up bulunamadı veya zaten kapalı, devam ediliyor...")
+
 def slow_smooth_scroll_with_collection(driver, base_url, city, category):
     """
     Her scroll adımında etkinlikleri toplar ve tekil bir sözlükte saklar.
@@ -258,6 +271,9 @@ def run_bubilet(category, city):
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "a.group.block"))
         )
+        
+        # Pop-up varsa kapat
+        popup_kapat(driver)
         
         # Scroll yaparak etkinlikleri topla
         extracted_events = slow_smooth_scroll_with_collection(driver, base_url, city, category)
